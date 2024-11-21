@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  biblioteca:
+    container_name: biblioteca
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./biblioteca:/biblioteca
+    env_file:
+      - ./dotenv_files/.env
+    depends_on:
+      - psql
+    
+  psql:
+    container_name: psql
+    image: postgres:13-alpine
+    expose:
+      - "5455"
+    ports:
+      - "5455:5432"
+    env_file:
+      - ./dotenv_files/.env
+    command: -p 5455
+    volumes:
+      - ./psql:/var/lib/postgresql/data
+    
+volumes:
+  psql:
+
+networks:
+  default:
+    driver: bridge
