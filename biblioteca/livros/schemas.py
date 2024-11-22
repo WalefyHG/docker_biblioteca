@@ -1,5 +1,5 @@
 from ninja import Schema
-from datetime import datetime
+from datetime import date
 
 
 class LivroSchemaIn(Schema):
@@ -7,7 +7,7 @@ class LivroSchemaIn(Schema):
     author: str
     pages: int
     price: float
-    pubdate: datetime
+    pubdate: date
 
 
 
@@ -17,7 +17,7 @@ class LivroSchemaOut(Schema):
     author: str
     pages: int
     price: float
-    pubdate: datetime
+    pubdate: date
 
 
 class LivroSchemaPut(Schema):
@@ -25,4 +25,4 @@ class LivroSchemaPut(Schema):
     author: str = ''
     pages: int = None
     price: float = None
-    pubdate: datetime = None
+    pubdate: date = None

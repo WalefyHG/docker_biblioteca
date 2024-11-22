@@ -71,3 +71,11 @@ def get_livro_id(request, id: int):
     livro_obj = get_object_or_404(Book, id=id)
 
     return livro_obj
+
+
+@router.get("/listarLivroPorTitulo/{title}", response=List[LivroSchemaOut])
+def get_livro_title(request, title: str):
+
+    livro_obj = Book.objects.filter(title=title)
+
+    return livro_obj

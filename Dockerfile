@@ -5,9 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 ENV PYTHONUNBUFFERED 1
 
-# Copia a pasta "djangoapp" e "scripts" para dentro do container.
 COPY biblioteca /biblioteca
-
 
 WORKDIR /biblioteca
 
