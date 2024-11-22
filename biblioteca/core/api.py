@@ -1,7 +1,11 @@
-from ninja import NinjaAPI
-from livros.views import router as LivroRouter
+from ninja_extra import NinjaExtraAPI
+from livros.views import LivroController
+from utils.login_page.login import LoginController
+from user.views import UserController
+from ninja_jwt.authentication import JWTAuth
 
-api = NinjaAPI(title="Biblioteca API", version="1.0.0")
+api = NinjaExtraAPI(title="Biblioteca API", version="1.0.0", auth=JWTAuth())
 
-
-api.add_router('/livros', LivroRouter, tags=["Rota dos livros"])
+api.register_controllers(LivroController)
+api.register_controllers(LoginController)
+api.register_controllers(UserController)
