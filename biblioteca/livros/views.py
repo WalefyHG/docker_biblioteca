@@ -1,88 +1,54 @@
 from typing import List
+from ninja import Form, Query
 from ninja_extra import api_controller, route
-from .schemas import LivroSchemaIn, LivroSchemaOut, LivroSchemaPut
+from .schemas import LivroSchemaIn, LivroSchemaOut, LivroSchemaPut, LivroResponseError, LivroDeleteSchemaOut, BookFilterSchema
 from .models import Book
 from django.shortcuts import get_object_or_404
 from ninja_extra.pagination import paginate, PageNumberPaginationExtra, PaginatedResponseSchema
-
+from .services import Services
 
 @api_controller(
     'book/',
     tags=["Rota dos Livros"],
-    auth=None,
+    
 )
 class LivroController:
 
-    @route.get('/list', response={200: PaginatedResponseSchema[LivroSchemaOut]})
+    services = Services
+
+    @route.get('/list', response={200: PaginatedResponseSchema[LivroSchemaOut], 404: LivroResponseError})
     @paginate(PageNumberPaginationExtra, page_size=5)
     def get_livros(self, request):
-        livros = Book.objects.all().order_by('id')
-        return livros
+        return self.services.list()
+    
+    @route.post('/create', response={201: LivroSchemaOut, 400: LivroResponseError})
+    def post_livros(self, request, payload: Form[LivroSchemaIn]):
 
-    @route.post('/create', response=LivroSchemaOut)
-    def post_livros(self, request, payload: LivroSchemaIn):
+        last_book_id = Book.objects.latest('id').id
+        return self.services.post(payload=payload.dict(), last_book_id=last_book_id)
+    
 
-        if Book.objects.filter(title=payload.title).exists():
-            return "Livro já existe"
-
-        livro = Book.objects.create(
-            title = payload.title,
-            author = payload.author,
-            pages = payload.pages,
-            price = payload.price,
-            pubdate = payload.pubdate
-        )
-
-        livro.save()
-
-
-        return livro
-
-    @route.put('/update/{id}', response=LivroSchemaOut )
+    @route.put('/update/{id}', response={200: LivroSchemaOut, 404: LivroResponseError})
     def put_livro(self, request, id: int, payload: LivroSchemaPut):
     
         livro_obj = get_object_or_404(Book, id=id)
+        return self.services.put(instance=livro_obj, id=id , payload=payload.dict(), last_book_id=Book.objects.latest('id').id)
+    
 
-        if payload.title:
-            livro_obj.title = payload.title
+    @route.patch('/update_partial/{id}', response=LivroSchemaOut)
+    def patch_livro(self, request, id: int, payload: LivroSchemaPut):
 
-        if payload.author:
-            livro_obj.author = payload.author
-
-        if payload.pages:
-            livro_obj.pages = payload.pages
-
-        if payload.price:
-            livro_obj.price = payload.price
-
-        if payload.pubdate:
-            livro_obj.pubdate = payload.pubdate
-
-        livro_obj.save()
-
-        return livro_obj
-
-
-    @route.delete("/delete/{id}", response={200: str})
+        livro_obj = get_object_or_404(Book, id=id)
+        return self.services.patch(instance=livro_obj, id=id , payload=payload.dict())
+    
+    @route.delete("/delete/{id}", response={204: LivroDeleteSchemaOut, 404: LivroResponseError})
     def delete_livro(self, request, id: int):
 
-        livro_obj = get_object_or_404(Book, id=id)
+        return self.services.delete(id=id)
+    
 
-        livro_obj.delete()
+    @route.get("/list_book_for_filters", response=List[LivroSchemaOut])
+    def get_livro_id(self, request, filters:BookFilterSchema = Query(...)):
 
-        return "Livro deletado com sucesso"
-
-    @route.get("/list_book_for_id/{id}", response=LivroSchemaOut)
-    def get_livro_id(self, request, id: int):
-
-        livro_obj = get_object_or_404(Book, id=id)
-
-        return livro_obj
-
-
-    @route.get("/list_book_for_title/{title}", response=List[LivroSchemaOut])
-    def get_livro_title(self, request, title: str):
-
-        livro_obj = Book.objects.filter(title=title)
-
-        return livro_obj
+        return self.services.list(filters=filters.dict())
+        

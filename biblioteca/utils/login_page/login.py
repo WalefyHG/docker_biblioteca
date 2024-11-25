@@ -1,3 +1,4 @@
+from ninja import Form
 from ninja_extra import api_controller, route, status
 from ninja_jwt.tokens import AccessToken, RefreshToken
 from django.contrib.auth.hashers import check_password
@@ -15,7 +16,7 @@ from user.models import User
 class LoginController(TokenObtainPairController):
 
     @route.post('', auth=None, response=Message)
-    def login(self, request, payload: TokenObtainPairInputSchema):
+    def login(self, request, payload: Form[TokenObtainPairInputSchema]):
         try:
             user = User.objects.get(email=payload.email)
 

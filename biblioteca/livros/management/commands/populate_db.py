@@ -37,7 +37,8 @@ class Command(BaseCommand):
                 is_active=True,
                 is_staff=False,
                 is_superuser=False,
-                date_joined=date.today()
+                date_joined=date.today(),
+                type_user=random.choice(['admin', 'user', 'employee'])
             )
 
             if created:
