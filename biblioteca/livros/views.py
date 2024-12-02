@@ -6,6 +6,7 @@ from .models import Book
 from django.shortcuts import get_object_or_404
 from ninja_extra.pagination import paginate, PageNumberPaginationExtra, PaginatedResponseSchema
 from .services import Services
+from utils.main_permission.permissions import AdminPermission
 
 @api_controller(
     'book/',

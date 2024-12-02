@@ -20,7 +20,7 @@ class UserController:
     services = Services
 
     @route.post('create', response={201: UserSchemaOut, 400: UserErroResponse})
-    def create_user(self, request, payload: Form[UserSchemaIn]):
+    def create_user(self, request, payload: UserSchemaIn = Form(...)):
 
         password = make_password(payload.password)
 

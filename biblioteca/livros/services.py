@@ -6,6 +6,10 @@ from django.db import IntegrityError, models, transaction
 from ninja_extra import status
 from .models import Book
 from django.db.models import Q
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from io import BytesIO
+
 
 class Services:
 
@@ -165,3 +169,4 @@ class Services:
             
         except IntegrityError as error:
             return status.HTTP_500_INTERNAL_SERVER_ERROR, {"message": str(error)}
+        
